@@ -93,14 +93,16 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             case "-":
             case "*":
             case "/":
-                calculadora.setOperando1(Double.parseDouble(pantallaResultado.getText()));
+                String operando1Str = pantallaResultado.getText().replace(",", ".");
+                calculadora.setOperando1(Double.parseDouble(operando1Str));
                 calculadora.setOperacion(input);
                 entrada.setLength(0);
                 break;
             case "=":
-                calculadora.setOperando2(Double.parseDouble(pantallaResultado.getText()));
+                String operando2Str = pantallaResultado.getText().replace(",", ".");
+                calculadora.setOperando2(Double.parseDouble(operando2Str));
                 try {
-                    double resultado = calculadora.calcular();
+                    Double resultado = calculadora.calcular(); 
                     pantallaResultado.setText(String.valueOf(resultado));
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
@@ -112,8 +114,9 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 entrada.setLength(0);
                 break;
             case ".":
-                if (!entrada.toString().contains(".")) {
-                    entrada.append(".");
+            case ",":
+                if (!entrada.toString().contains(",")) {
+                    entrada.append(",");
                     pantallaResultado.setText(entrada.toString());
                 }
                 break;
@@ -123,6 +126,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 break;
         }
     }
+    
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -146,8 +150,9 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             case KeyEvent.VK_NUMPAD9:
                 procesarEntrada(String.valueOf(keyCode - KeyEvent.VK_NUMPAD0));
                 break;
-            case KeyEvent.VK_DECIMAL:
-                procesarEntrada(".");
+                case KeyEvent.VK_COMMA:
+                case KeyEvent.VK_DECIMAL:
+                procesarEntrada(",");
                 break;
             case KeyEvent.VK_ADD:
                 procesarEntrada("+");
@@ -166,6 +171,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 break;
             case KeyEvent.VK_BACK_SPACE:
                 procesarEntrada("C");
+
             default:
                 break;
         }
