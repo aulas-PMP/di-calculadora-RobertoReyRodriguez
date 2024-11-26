@@ -16,10 +16,19 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         modoEntrada = "Libre";
 
         setTitle("Calculadora Rober");
-        setSize(400, 600);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = screenSize.width / 2;
+        setSize(width, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                setLocationRelativeTo(null);
+            }
+        });
 
         panelModoEntrada = new JPanel() {
             @Override
@@ -102,15 +111,18 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 String operando2Str = pantallaResultado.getText().replace(",", ".");
                 calculadora.setOperando2(Double.parseDouble(operando2Str));
                 try {
-                    Double resultado = calculadora.calcular(); 
+                    Double resultado = calculadora.calcular();
                     pantallaResultado.setText(String.valueOf(resultado));
+                    actualizarColorResultado(resultado);
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
+                    pantallaResultado.setForeground(Color.RED);  // Mostrar el error en rojo
                 }
                 entrada.setLength(0);
                 break;
             case "C":
                 pantallaResultado.setText("0");
+                pantallaResultado.setForeground(Color.BLACK);  // Restablecer a negro
                 entrada.setLength(0);
                 break;
             case ".":
@@ -123,10 +135,10 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             default:
                 entrada.append(input);
                 pantallaResultado.setText(entrada.toString());
+                actualizarColorResultado(Double.parseDouble(pantallaResultado.getText().replace(",", ".")));
                 break;
         }
     }
-    
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -150,8 +162,8 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             case KeyEvent.VK_NUMPAD9:
                 procesarEntrada(String.valueOf(keyCode - KeyEvent.VK_NUMPAD0));
                 break;
-                case KeyEvent.VK_COMMA:
-                case KeyEvent.VK_DECIMAL:
+            case KeyEvent.VK_COMMA:
+            case KeyEvent.VK_DECIMAL:
                 procesarEntrada(",");
                 break;
             case KeyEvent.VK_ADD:
@@ -216,12 +228,19 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         panelModoEntrada.repaint();
         this.requestFocusInWindow();
     }
-
+    private void actualizarColorResultado(double valor) {
+        if (valor < 0) {
+            pantallaResultado.setForeground(Color.RED); 
+        } else {
+            pantallaResultado.setForeground(Color.BLACK);} 
+    }
+    
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             CalculadoraGUI calculadoraGUI = new CalculadoraGUI();
             calculadoraGUI.setVisible(true);
-            calculadoraGUI.setModoEntrada("Libre");
+            calculadoraGUI.setModoEntrada("Ratón");
         });
     }
 }
