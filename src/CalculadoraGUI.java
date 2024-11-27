@@ -2,6 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * Clase que representa la interfaz gráfica de una calculadora.
+ * Utiliza Java Swing para la representación visual de los componentes y 
+ * gestiona las operaciones básicas de una calculadora.
+ */
 public class CalculadoraGUI extends JFrame implements ActionListener, KeyListener, WindowListener {
     private Calculadora calculadora;
     private JTextField pantallaEntrada;
@@ -10,6 +15,11 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     private String modoEntrada;
     private JPanel panelModoEntrada;
 
+    /**
+     * Constructor de la clase CalculadoraGUI.
+     * Inicializa todos los componentes de la interfaz gráfica, define el tamaño de la ventana
+     * y establece las acciones que se realizan en los diferentes eventos de usuario.
+     */
     public CalculadoraGUI() {
         calculadora = new Calculadora();
         entrada = new StringBuilder();
@@ -78,12 +88,23 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         setFocusTraversalKeysEnabled(false);
     }
 
+    /**
+     * Agrega un botón al panel especificado.
+     * 
+     * @param panel El panel al que se agrega el botón.
+     * @param nombre El texto que se mostrará en el botón.
+     */
     private void agregarBoton(JPanel panel, String nombre) {
         JButton boton = new JButton(nombre);
         boton.addActionListener(this);
         panel.add(boton);
     }
 
+    /**
+     * Maneja los eventos de acción de los botones.
+     * 
+     * @param e El evento de acción generado por el usuario.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!modoEntrada.equals("Ratón") && !modoEntrada.equals("Libre")) {
@@ -96,6 +117,11 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         this.requestFocusInWindow();
     }
 
+    /**
+     * Procesa la entrada del usuario y actualiza el resultado según la operación ingresada.
+     * 
+     * @param input El valor ingresado por el usuario.
+     */
     private void procesarEntrada(String input) {
         switch (input) {
             case "+":
@@ -116,13 +142,13 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                     actualizarColorResultado(resultado);
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
-                    pantallaResultado.setForeground(Color.RED);  // Mostrar el error en rojo
+                    pantallaResultado.setForeground(Color.RED);  
                 }
                 entrada.setLength(0);
                 break;
             case "C":
                 pantallaResultado.setText("0");
-                pantallaResultado.setForeground(Color.BLACK);  // Restablecer a negro
+                pantallaResultado.setForeground(Color.BLACK);  
                 entrada.setLength(0);
                 break;
             case ".":
@@ -140,9 +166,21 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         }
     }
 
+    /**
+     * Actualiza el color del resultado en pantalla. Los números negativos se muestran en rojo.
+     * 
+     * @param valor El valor actual del resultado a mostrar.
+     */
+    private void actualizarColorResultado(double valor) {
+        if (valor < 0) {
+            pantallaResultado.setForeground(Color.RED);
+        } else {
+            pantallaResultado.setForeground(Color.BLACK);
+        }
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -183,7 +221,6 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 break;
             case KeyEvent.VK_BACK_SPACE:
                 procesarEntrada("C");
-
             default:
                 break;
         }
@@ -223,24 +260,27 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     public void windowDeactivated(WindowEvent e) {
     }
 
+    /**
+     * Establece el modo de entrada (Ratón, Libre, etc.) y actualiza la interfaz para reflejar el modo actual.
+     * 
+     * @param modo El modo de entrada que se debe establecer.
+     */
     public void setModoEntrada(String modo) {
         this.modoEntrada = modo;
         panelModoEntrada.repaint();
         this.requestFocusInWindow();
     }
-    private void actualizarColorResultado(double valor) {
-        if (valor < 0) {
-            pantallaResultado.setForeground(Color.RED); 
-        } else {
-            pantallaResultado.setForeground(Color.BLACK);} 
-    }
-    
-    
+
+    /**
+     * Método principal para iniciar la calculadora.
+     * 
+     * @param args Argumentos de línea de comandos.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             CalculadoraGUI calculadoraGUI = new CalculadoraGUI();
             calculadoraGUI.setVisible(true);
-            calculadoraGUI.setModoEntrada("Ratón");
+            calculadoraGUI.setModoEntrada("Libre");
         });
     }
 }
