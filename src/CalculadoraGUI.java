@@ -70,7 +70,6 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         panelModoEntrada.setBorder(new LineBorder(Color.BLACK, 2));
         add(panelModoEntrada, BorderLayout.NORTH);
 
-        // Configurar la pantalla de resultados con el logo de la Horda
         pantallaResultado = new JLabel("0", SwingConstants.RIGHT) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -195,6 +194,11 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
      * 
      * @param input El valor ingresado por el usuario.
      */
+    /**
+     * Procesa la entrada del usuario y actualiza el resultado según la operación ingresada.
+     * 
+     * @param input El valor ingresado por el usuario.
+     */
     private void procesarEntrada(String input) {
         switch (input) {
             case "+":
@@ -204,6 +208,8 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 String operando1Str = pantallaResultado.getText().replace(",", ".");
                 calculadora.setOperando1(Double.parseDouble(operando1Str));
                 calculadora.setOperacion(input);
+                pantallaAlmacenada.setText("Valor Almacenado: " + operando1Str);
+                pantallaEntrada.setText(operando1Str);
                 entrada.setLength(0);
                 break;
             case "=":
@@ -212,6 +218,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 try {
                     Double resultado = calculadora.calcular();
                     pantallaResultado.setText(String.valueOf(resultado));
+                    pantallaEntrada.setText(String.valueOf(resultado));
                     actualizarColorResultado(resultado);
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
@@ -221,6 +228,8 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 break;
             case "C":
                 pantallaResultado.setText("0");
+                pantallaAlmacenada.setText("Valor Almacenado: 0");
+                pantallaEntrada.setText("");
                 pantallaResultado.setForeground(Color.WHITE);  // Restablecer a blanco
                 entrada.setLength(0);
                 break;
@@ -229,11 +238,13 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 if (!entrada.toString().contains(",")) {
                     entrada.append(",");
                     pantallaResultado.setText(entrada.toString());
+                    pantallaEntrada.setText(entrada.toString());
                 }
                 break;
             default:
                 entrada.append(input);
                 pantallaResultado.setText(entrada.toString());
+                pantallaEntrada.setText(entrada.toString());
                 actualizarColorResultado(Double.parseDouble(pantallaResultado.getText().replace(",", ".")));
                 break;
         }
