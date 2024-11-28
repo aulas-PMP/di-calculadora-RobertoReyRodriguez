@@ -1,9 +1,14 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+
 import java.awt.*;
 import java.awt.event.*;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.io.File;
 
 /**
- * Clase que representa la interfaz gráfica de una calculadora.
+ * CalculadoraGUI es una clase que representa la interfaz gráfica de una calculadora.
  * Utiliza Java Swing para la representación visual de los componentes y 
  * gestiona las operaciones básicas de una calculadora.
  */
@@ -14,6 +19,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     private StringBuilder entrada;
     private String modoEntrada;
     private JPanel panelModoEntrada;
+    private Font fuentePersonalizada;
 
     /**
      * Constructor de la clase CalculadoraGUI.
@@ -25,13 +31,23 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         entrada = new StringBuilder();
         modoEntrada = "Libre";
 
-        setTitle("Calculadora Rober");
+        setTitle("Calculadora Rober - Horda");
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = screenSize.width / 2;
         setSize(width, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Cargar la fuente personalizada
+        try {
+            fuentePersonalizada = Font.createFont(Font.TRUETYPE_FONT, new File("src/fuente/lifecraftfont.ttf")).deriveFont(18f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(fuentePersonalizada);
+        } catch (IOException | FontFormatException e) {
+            e.printStackTrace();
+            fuentePersonalizada = new Font("Arial", Font.BOLD, 18); // Fuente de respaldo
+        }
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -40,47 +56,84 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             }
         });
 
+        // Configurar el panel de modo de entrada
         panelModoEntrada = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                g.setFont(fuentePersonalizada);
+                g.setColor(Color.BLACK);
                 g.drawString("Modo Actual: " + modoEntrada, 10, 20);
             }
         };
-        panelModoEntrada.setPreferredSize(new Dimension(400, 40));
+        panelModoEntrada.setPreferredSize(new Dimension(width, 40));
+        panelModoEntrada.setBorder(new LineBorder(Color.BLACK, 2));
         add(panelModoEntrada, BorderLayout.NORTH);
 
-        pantallaEntrada = new JTextField();
-        pantallaEntrada.setEditable(false);
-        pantallaEntrada.setHorizontalAlignment(JTextField.RIGHT);
+        // Configurar la pantalla de resultados con el logo de la Horda
+        pantallaResultado = new JLabel("0", SwingConstants.RIGHT) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                try {
+                    Image img = ImageIO.read(new File("src/imagen/logohorda.png")); 
+                    if (img != null) {
+                        int imgWidth = getWidth();
+                        int imgHeight = getHeight();
+                        g.drawImage(img, 0, 0, imgWidth, imgHeight, this);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        pantallaResultado.setOpaque(true);
+        pantallaResultado.setBackground(Color.BLACK);
+        pantallaResultado.setForeground(new Color(255, 0, 0)); 
+        pantallaResultado.setFont(fuentePersonalizada.deriveFont(24f));
+        pantallaResultado.setPreferredSize(new Dimension(width, 80));
+        pantallaResultado.setBorder(new LineBorder(Color.BLACK, 2));
+        add(pantallaResultado, BorderLayout.NORTH);
 
-        pantallaResultado = new JLabel("0", SwingConstants.RIGHT);
-
-        JPanel panelPantalla = new JPanel(new GridLayout(2, 1));
-        panelPantalla.add(pantallaEntrada);
-        panelPantalla.add(pantallaResultado);
-
+        // Configurar los botones numéricos con la estética de la Horda
         JPanel panelNumeros = new JPanel(new GridLayout(4, 3));
+        panelNumeros.setBorder(new LineBorder(Color.BLACK, 2));
         for (int i = 1; i <= 9; i++) {
-            agregarBoton(panelNumeros, String.valueOf(i));
+            agregarBotonNumerico(panelNumeros, String.valueOf(i));
         }
-        agregarBoton(panelNumeros, "0");
-        agregarBoton(panelNumeros, ".");
+        agregarBotonNumerico(panelNumeros, "0");
+        agregarBotonNumerico(panelNumeros, ".");
+        agregarBotonNumerico(panelNumeros, "C");
 
+        // Configurar los botones de operaciones con la estética de la Horda
         JPanel panelOperaciones = new JPanel(new GridLayout(5, 1));
-        agregarBoton(panelOperaciones, "+");
-        agregarBoton(panelOperaciones, "-");
-        agregarBoton(panelOperaciones, "*");
-        agregarBoton(panelOperaciones, "/");
-        agregarBoton(panelOperaciones, "=");
+        panelOperaciones.setBorder(new LineBorder(Color.BLACK, 1));
+        agregarBotonOperacion(panelOperaciones, "+");
+        agregarBotonOperacion(panelOperaciones, "-");
+        agregarBotonOperacion(panelOperaciones, "*");
+        agregarBotonOperacion(panelOperaciones, "/");
+        agregarBotonOperacion(panelOperaciones, "=");
 
-        JPanel panelBotonLimpieza = new JPanel(new FlowLayout());
-        agregarBoton(panelBotonLimpieza, "C");
+        JPanel panelCentral = new JPanel(new GridBagLayout());
+        panelCentral.setBorder(new LineBorder(Color.BLACK, 1));
+        GridBagConstraints gbc = new GridBagConstraints();
+        // Configuración para el panel de números
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.68;  
+        gbc.weighty = 1.0;  
+        gbc.fill = GridBagConstraints.BOTH; 
+        panelCentral.add(panelNumeros, gbc);
 
-        add(panelPantalla, BorderLayout.CENTER);
-        add(panelNumeros, BorderLayout.WEST);
-        add(panelOperaciones, BorderLayout.EAST);
-        add(panelBotonLimpieza, BorderLayout.SOUTH);
+        // Configuración para el panel de operaciones
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.29;  
+        gbc.weighty = 1.0;  
+        gbc.fill = GridBagConstraints.BOTH;
+        panelCentral.add(panelOperaciones, gbc);
+
+        add(panelCentral, BorderLayout.CENTER);
 
         addKeyListener(this);
         addWindowListener(this);
@@ -89,14 +142,34 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     }
 
     /**
-     * Agrega un botón al panel especificado.
+     * Agrega un botón numérico al panel especificado.
      * 
      * @param panel El panel al que se agrega el botón.
      * @param nombre El texto que se mostrará en el botón.
      */
-    private void agregarBoton(JPanel panel, String nombre) {
+    private void agregarBotonNumerico(JPanel panel, String nombre) {
         JButton boton = new JButton(nombre);
         boton.addActionListener(this);
+        boton.setBackground(new Color(153, 0, 0)); 
+        boton.setForeground(Color.WHITE); 
+        boton.setFont(fuentePersonalizada);
+        boton.setBorder(new LineBorder(Color.BLACK, 1)); 
+        panel.add(boton);
+    }
+
+    /**
+     * Agrega un botón de operación al panel especificado.
+     * 
+     * @param panel El panel al que se agrega el botón.
+     * @param nombre El texto que se mostrará en el botón.
+     */
+    private void agregarBotonOperacion(JPanel panel, String nombre) {
+        JButton boton = new JButton(nombre);
+        boton.addActionListener(this);
+        boton.setBackground(new Color(153, 0, 0)); // Fondo rojo intenso
+        boton.setForeground(Color.WHITE); 
+        boton.setFont(fuentePersonalizada);
+        boton.setBorder(new LineBorder(Color.BLACK, 1)); // Añadir borde negro
         panel.add(boton);
     }
 
@@ -142,13 +215,13 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                     actualizarColorResultado(resultado);
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
-                    pantallaResultado.setForeground(Color.RED);  
+                    pantallaResultado.setForeground(Color.RED);  // Mostrar el error en rojo
                 }
                 entrada.setLength(0);
                 break;
             case "C":
                 pantallaResultado.setText("0");
-                pantallaResultado.setForeground(Color.BLACK);  
+                pantallaResultado.setForeground(Color.WHITE);  // Restablecer a blanco
                 entrada.setLength(0);
                 break;
             case ".":
@@ -175,7 +248,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         if (valor < 0) {
             pantallaResultado.setForeground(Color.RED);
         } else {
-            pantallaResultado.setForeground(Color.BLACK);
+            pantallaResultado.setForeground(Color.WHITE);
         }
     }
 
