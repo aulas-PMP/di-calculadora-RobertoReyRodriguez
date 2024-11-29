@@ -1,31 +1,21 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.File;
 
-/**
- * CalculadoraGUI es una clase que representa la interfaz gráfica de una calculadora.
- * Utiliza Java Swing para la representación visual de los componentes y 
- * gestiona las operaciones básicas de una calculadora.
- */
 public class CalculadoraGUI extends JFrame implements ActionListener, KeyListener, WindowListener {
     private Calculadora calculadora;
-    private JTextField pantallaEntrada;
     private JLabel pantallaResultado;
+    private JLabel pantallaAlmacenada; // Nueva pantalla para mostrar valor almacenado
     private StringBuilder entrada;
     private String modoEntrada;
     private JPanel panelModoEntrada;
+    private JLabel labelModoEntrada;
     private Font fuentePersonalizada;
 
-    /**
-     * Constructor de la clase CalculadoraGUI.
-     * Inicializa todos los componentes de la interfaz gráfica, define el tamaño de la ventana
-     * y establece las acciones que se realizan en los diferentes eventos de usuario.
-     */
     public CalculadoraGUI() {
         calculadora = new Calculadora();
         entrada = new StringBuilder();
@@ -38,10 +28,12 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.BLACK);
 
         // Cargar la fuente personalizada
         try {
-            fuentePersonalizada = Font.createFont(Font.TRUETYPE_FONT, new File("src/fuente/lifecraftfont.ttf")).deriveFont(18f);
+            fuentePersonalizada = Font.createFont(Font.TRUETYPE_FONT, new File("src/fuente/lifecraftfont.ttf"))
+                    .deriveFont(18f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(fuentePersonalizada);
         } catch (IOException | FontFormatException e) {
@@ -57,25 +49,32 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         });
 
         // Configurar el panel de modo de entrada
-        panelModoEntrada = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setFont(fuentePersonalizada);
-                g.setColor(Color.BLACK);
-                g.drawString("Modo Actual: " + modoEntrada, 10, 20);
-            }
-        };
-        panelModoEntrada.setPreferredSize(new Dimension(width, 40));
-        panelModoEntrada.setBorder(new LineBorder(Color.BLACK, 2));
+        panelModoEntrada = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        labelModoEntrada = new JLabel("Modo Actual: Libre", SwingConstants.LEFT);
+        labelModoEntrada.setForeground(Color.WHITE);
+        labelModoEntrada.setFont(fuentePersonalizada);
+        panelModoEntrada.add(labelModoEntrada);
+        //panelModoEntrada.setPreferredSize(new Dimension(width, 40));
+        panelModoEntrada.setBorder(BorderFactory.createEmptyBorder());
         add(panelModoEntrada, BorderLayout.NORTH);
 
+        // Nueva pantalla para mostrar el valor almacenado y el modo de entrada
+        pantallaAlmacenada = new JLabel("Valor Almacenado: 0   |   Modo Actual: Libre", SwingConstants.RIGHT);
+        pantallaAlmacenada.setOpaque(true);
+        pantallaAlmacenada.setBackground(Color.DARK_GRAY);
+        pantallaAlmacenada.setForeground(Color.WHITE);
+        pantallaAlmacenada.setFont(fuentePersonalizada.deriveFont(18f));
+       // pantallaAlmacenada.setPreferredSize(new Dimension(width, 30));
+        pantallaAlmacenada.setBorder(BorderFactory.createEmptyBorder());
+        add(pantallaAlmacenada, BorderLayout.NORTH);
+
+        // Configurar la pantalla de resultado
         pantallaResultado = new JLabel("0", SwingConstants.RIGHT) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 try {
-                    Image img = ImageIO.read(new File("src/imagen/logohorda.png")); 
+                    Image img = ImageIO.read(new File("src/imagen/logohorda.png"));
                     if (img != null) {
                         int imgWidth = getWidth();
                         int imgHeight = getHeight();
@@ -88,15 +87,15 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         };
         pantallaResultado.setOpaque(true);
         pantallaResultado.setBackground(Color.BLACK);
-        pantallaResultado.setForeground(new Color(255, 0, 0)); 
-        pantallaResultado.setFont(fuentePersonalizada.deriveFont(24f));
-        pantallaResultado.setPreferredSize(new Dimension(width, 80));
-        pantallaResultado.setBorder(new LineBorder(Color.BLACK, 2));
-        add(pantallaResultado, BorderLayout.NORTH);
+        pantallaResultado.setForeground(new Color(255, 0, 0));
+        pantallaResultado.setFont(fuentePersonalizada.deriveFont(48f));
+        //pantallaResultado.setPreferredSize(new Dimension(width, 50));
+        pantallaResultado.setBorder(BorderFactory.createEmptyBorder());
+        add(pantallaResultado, BorderLayout.CENTER);
 
         // Configurar los botones numéricos con la estética de la Horda
         JPanel panelNumeros = new JPanel(new GridLayout(4, 3));
-        panelNumeros.setBorder(new LineBorder(Color.BLACK, 2));
+        panelNumeros.setBorder(BorderFactory.createEmptyBorder());
         for (int i = 1; i <= 9; i++) {
             agregarBotonNumerico(panelNumeros, String.valueOf(i));
         }
@@ -106,7 +105,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
 
         // Configurar los botones de operaciones con la estética de la Horda
         JPanel panelOperaciones = new JPanel(new GridLayout(5, 1));
-        panelOperaciones.setBorder(new LineBorder(Color.BLACK, 1));
+        panelOperaciones.setBorder(BorderFactory.createEmptyBorder());
         agregarBotonOperacion(panelOperaciones, "+");
         agregarBotonOperacion(panelOperaciones, "-");
         agregarBotonOperacion(panelOperaciones, "*");
@@ -114,25 +113,26 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         agregarBotonOperacion(panelOperaciones, "=");
 
         JPanel panelCentral = new JPanel(new GridBagLayout());
-        panelCentral.setBorder(new LineBorder(Color.BLACK, 1));
+        panelCentral.setBorder(BorderFactory.createEmptyBorder());
+        
         GridBagConstraints gbc = new GridBagConstraints();
         // Configuración para el panel de números
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 0.68;  
-        gbc.weighty = 1.0;  
-        gbc.fill = GridBagConstraints.BOTH; 
+        gbc.weightx = 0.7;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
         panelCentral.add(panelNumeros, gbc);
 
         // Configuración para el panel de operaciones
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.weightx = 0.29;  
-        gbc.weighty = 1.0;  
+        gbc.weightx = 0.3;
+        gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         panelCentral.add(panelOperaciones, gbc);
 
-        add(panelCentral, BorderLayout.CENTER);
+        add(panelCentral, BorderLayout.SOUTH);
 
         addKeyListener(this);
         addWindowListener(this);
@@ -140,43 +140,26 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         setFocusTraversalKeysEnabled(false);
     }
 
-    /**
-     * Agrega un botón numérico al panel especificado.
-     * 
-     * @param panel El panel al que se agrega el botón.
-     * @param nombre El texto que se mostrará en el botón.
-     */
     private void agregarBotonNumerico(JPanel panel, String nombre) {
         JButton boton = new JButton(nombre);
         boton.addActionListener(this);
-        boton.setBackground(new Color(153, 0, 0)); 
-        boton.setForeground(Color.WHITE); 
+        boton.setBackground(new Color(153, 0, 0));
+        boton.setForeground(Color.WHITE);
         boton.setFont(fuentePersonalizada);
-        boton.setBorder(new LineBorder(Color.BLACK, 1)); 
+        boton.setBorder(new LineBorder(Color.BLACK, 1));
         panel.add(boton);
     }
 
-    /**
-     * Agrega un botón de operación al panel especificado.
-     * 
-     * @param panel El panel al que se agrega el botón.
-     * @param nombre El texto que se mostrará en el botón.
-     */
     private void agregarBotonOperacion(JPanel panel, String nombre) {
         JButton boton = new JButton(nombre);
         boton.addActionListener(this);
-        boton.setBackground(new Color(153, 0, 0)); // Fondo rojo intenso
-        boton.setForeground(Color.WHITE); 
+        boton.setBackground(new Color(153, 0, 0));
+        boton.setForeground(Color.WHITE);
         boton.setFont(fuentePersonalizada);
-        boton.setBorder(new LineBorder(Color.BLACK, 1)); // Añadir borde negro
+        boton.setBorder(new LineBorder(Color.BLACK, 1));
         panel.add(boton);
     }
 
-    /**
-     * Maneja los eventos de acción de los botones.
-     * 
-     * @param e El evento de acción generado por el usuario.
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!modoEntrada.equals("Ratón") && !modoEntrada.equals("Libre")) {
@@ -189,16 +172,6 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         this.requestFocusInWindow();
     }
 
-    /**
-     * Procesa la entrada del usuario y actualiza el resultado según la operación ingresada.
-     * 
-     * @param input El valor ingresado por el usuario.
-     */
-    /**
-     * Procesa la entrada del usuario y actualiza el resultado según la operación ingresada.
-     * 
-     * @param input El valor ingresado por el usuario.
-     */
     private void procesarEntrada(String input) {
         switch (input) {
             case "+":
@@ -209,7 +182,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 calculadora.setOperando1(Double.parseDouble(operando1Str));
                 calculadora.setOperacion(input);
                 pantallaAlmacenada.setText("Valor Almacenado: " + operando1Str);
-                pantallaEntrada.setText(operando1Str);
+                pantallaResultado.setText("0");
                 entrada.setLength(0);
                 break;
             case "=":
@@ -217,20 +190,19 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 calculadora.setOperando2(Double.parseDouble(operando2Str));
                 try {
                     Double resultado = calculadora.calcular();
-                    pantallaResultado.setText(String.valueOf(resultado));
-                    pantallaEntrada.setText(String.valueOf(resultado));
+                    pantallaResultado.setText(String.valueOf(resultado).replace(".", ","));
+                    pantallaAlmacenada.setText("Resultado: " + String.valueOf(resultado).replace(".", ","));
                     actualizarColorResultado(resultado);
                 } catch (ArithmeticException ex) {
                     pantallaResultado.setText("Error");
-                    pantallaResultado.setForeground(Color.RED);  // Mostrar el error en rojo
+                    pantallaResultado.setForeground(Color.RED);
                 }
                 entrada.setLength(0);
                 break;
             case "C":
                 pantallaResultado.setText("0");
                 pantallaAlmacenada.setText("Valor Almacenado: 0");
-                pantallaEntrada.setText("");
-                pantallaResultado.setForeground(Color.WHITE);  // Restablecer a blanco
+                pantallaResultado.setForeground(Color.WHITE);
                 entrada.setLength(0);
                 break;
             case ".":
@@ -238,23 +210,16 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 if (!entrada.toString().contains(",")) {
                     entrada.append(",");
                     pantallaResultado.setText(entrada.toString());
-                    pantallaEntrada.setText(entrada.toString());
                 }
                 break;
             default:
                 entrada.append(input);
                 pantallaResultado.setText(entrada.toString());
-                pantallaEntrada.setText(entrada.toString());
                 actualizarColorResultado(Double.parseDouble(pantallaResultado.getText().replace(",", ".")));
                 break;
         }
     }
 
-    /**
-     * Actualiza el color del resultado en pantalla. Los números negativos se muestran en rojo.
-     * 
-     * @param valor El valor actual del resultado a mostrar.
-     */
     private void actualizarColorResultado(double valor) {
         if (valor < 0) {
             pantallaResultado.setForeground(Color.RED);
@@ -344,22 +309,14 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     public void windowDeactivated(WindowEvent e) {
     }
 
-    /**
-     * Establece el modo de entrada (Ratón, Libre, etc.) y actualiza la interfaz para reflejar el modo actual.
-     * 
-     * @param modo El modo de entrada que se debe establecer.
-     */
     public void setModoEntrada(String modo) {
+        this.modoEntrada = modo;
+        labelModoEntrada.setText("Modo Actual: " + modo);
         this.modoEntrada = modo;
         panelModoEntrada.repaint();
         this.requestFocusInWindow();
     }
 
-    /**
-     * Método principal para iniciar la calculadora.
-     * 
-     * @param args Argumentos de línea de comandos.
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             CalculadoraGUI calculadoraGUI = new CalculadoraGUI();
