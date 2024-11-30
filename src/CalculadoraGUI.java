@@ -28,7 +28,19 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        getContentPane().setBackground(Color.BLACK);
+
+        // Cargar la imagen de fondo
+        try {
+            JLabel backgroundLabel = new JLabel(new ImageIcon(ImageIO.read(new File("src/imagen/logohorda.png"))));
+            backgroundLabel.setBackground(Color.BLACK);
+            backgroundLabel.setOpaque(true);
+            backgroundLabel.setLayout(new BorderLayout());
+            setContentPane(backgroundLabel);
+            getContentPane().setBackground(Color.BLACK);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setLayout(new BorderLayout());
 
         // Cargar la fuente personalizada
         try {
@@ -50,51 +62,33 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
 
         // Configurar el panel de modo de entrada
         panelModoEntrada = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelModoEntrada.setOpaque(false); // Hacer transparente
         labelModoEntrada = new JLabel("Modo Actual: Libre", SwingConstants.LEFT);
         labelModoEntrada.setForeground(Color.WHITE);
         labelModoEntrada.setFont(fuentePersonalizada);
         panelModoEntrada.add(labelModoEntrada);
-        //panelModoEntrada.setPreferredSize(new Dimension(width, 40));
         panelModoEntrada.setBorder(BorderFactory.createEmptyBorder());
         add(panelModoEntrada, BorderLayout.NORTH);
 
         // Nueva pantalla para mostrar el valor almacenado y el modo de entrada
         pantallaAlmacenada = new JLabel("Valor Almacenado: 0   |   Modo Actual: Libre", SwingConstants.RIGHT);
-        pantallaAlmacenada.setOpaque(true);
-        pantallaAlmacenada.setBackground(Color.DARK_GRAY);
+        pantallaAlmacenada.setOpaque(false); // Hacer transparente
         pantallaAlmacenada.setForeground(Color.WHITE);
         pantallaAlmacenada.setFont(fuentePersonalizada.deriveFont(18f));
-       // pantallaAlmacenada.setPreferredSize(new Dimension(width, 30));
         pantallaAlmacenada.setBorder(BorderFactory.createEmptyBorder());
         add(pantallaAlmacenada, BorderLayout.NORTH);
 
         // Configurar la pantalla de resultado
-        pantallaResultado = new JLabel("0", SwingConstants.RIGHT) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                try {
-                    Image img = ImageIO.read(new File("src/imagen/logohorda.png"));
-                    if (img != null) {
-                        int imgWidth = getWidth();
-                        int imgHeight = getHeight();
-                        g.drawImage(img, 0, 0, imgWidth, imgHeight, this);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        pantallaResultado.setOpaque(true);
-        pantallaResultado.setBackground(Color.BLACK);
+        pantallaResultado = new JLabel("0", SwingConstants.RIGHT);
+        pantallaResultado.setOpaque(false); // Hacer transparente
         pantallaResultado.setForeground(new Color(255, 0, 0));
         pantallaResultado.setFont(fuentePersonalizada.deriveFont(48f));
-        //pantallaResultado.setPreferredSize(new Dimension(width, 50));
         pantallaResultado.setBorder(BorderFactory.createEmptyBorder());
         add(pantallaResultado, BorderLayout.CENTER);
 
         // Configurar los botones numéricos con la estética de la Horda
         JPanel panelNumeros = new JPanel(new GridLayout(4, 3));
+        panelNumeros.setOpaque(false); // Hacer transparente
         panelNumeros.setBorder(BorderFactory.createEmptyBorder());
         for (int i = 1; i <= 9; i++) {
             agregarBotonNumerico(panelNumeros, String.valueOf(i));
@@ -105,6 +99,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
 
         // Configurar los botones de operaciones con la estética de la Horda
         JPanel panelOperaciones = new JPanel(new GridLayout(5, 1));
+        panelOperaciones.setOpaque(false); // Hacer transparente
         panelOperaciones.setBorder(BorderFactory.createEmptyBorder());
         agregarBotonOperacion(panelOperaciones, "+");
         agregarBotonOperacion(panelOperaciones, "-");
@@ -113,6 +108,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         agregarBotonOperacion(panelOperaciones, "=");
 
         JPanel panelCentral = new JPanel(new GridBagLayout());
+        panelCentral.setOpaque(false); // Hacer transparente
         panelCentral.setBorder(BorderFactory.createEmptyBorder());
         
         GridBagConstraints gbc = new GridBagConstraints();
