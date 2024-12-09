@@ -41,7 +41,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             }
         });
 
-        // Cargar la imagen de fondo
+        // Esto añade la imagen
         try {
             JLabel backgroundLabel = new JLabel(new ImageIcon(ImageIO.read(new File("src/imagen/logohorda.png"))));
             backgroundLabel.setBackground(Color.BLACK);
@@ -54,7 +54,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         }
         setLayout(new BorderLayout());
 
-        // Cargar la fuente personalizada
+        // Esto añade la fuente
         try {
             fuentePersonalizada = Font.createFont(Font.TRUETYPE_FONT, new File("src/fuente/lifecraftfont.ttf"))
                     .deriveFont(18f);
@@ -71,12 +71,12 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
                 int newWidth = getWidth();
                 int newHeight = getHeight();
 
-                // Ajustar las fuentes en base al tamaño de la ventana
+                // Ajusta las fuentes en base al tamaño de la ventana
                 float baseFontSize = Math.min(newWidth, newHeight) / 30.0f;
                 pantallaResultado.setFont(fuentePersonalizada.deriveFont(baseFontSize * 2));
                 pantallaAlmacenada.setFont(fuentePersonalizada.deriveFont(baseFontSize));
 
-                // Ajustar botones numéricos y de operaciones
+                // Ajusta botones numéricos y de operaciones
                 for (Component comp : getContentPane().getComponents()) {
                     if (comp instanceof JPanel) {
                         for (Component subComponent : ((JPanel) comp).getComponents()) {
@@ -99,7 +99,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             }
         });
 
-        // Configurar el panel de modo de entrada
+        // Configura el panel de modo de entrada
         panelModoEntrada = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelModoEntrada.setOpaque(false); // Hacer transparente
         labelModoEntrada = new JLabel("Modo Actual:" + modoEntrada, SwingConstants.LEFT);
@@ -125,7 +125,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         pantallaResultado.setBorder(BorderFactory.createEmptyBorder());
         add(pantallaResultado, BorderLayout.CENTER);
 
-        // Configurar los botones numéricos con la estética de la Horda
+        // Configuración de los botones numéricos con la estética de la Horda
         JPanel panelNumeros = new JPanel(new GridLayout(4, 3));
         panelNumeros.setOpaque(false); // Hacer transparente
         panelNumeros.setBorder(BorderFactory.createEmptyBorder());
@@ -136,7 +136,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         agregarBotonNumerico(panelNumeros, ".");
         agregarBotonNumerico(panelNumeros, "C");
 
-        // Configurar los botones de operaciones con la estética de la Horda
+        // Configuración de los botones de operaciones con la estética de la Horda
         JPanel panelOperaciones = new JPanel(new GridLayout(5, 1));
         panelOperaciones.setOpaque(false); // Hacer transparente
         panelOperaciones.setBorder(BorderFactory.createEmptyBorder());
