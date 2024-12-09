@@ -6,7 +6,7 @@ import javax.imageio.ImageIO;
 import java.io.IOException;
 import java.io.File;
 
-public class CalculadoraGUI extends JFrame implements ActionListener, KeyListener, WindowListener {
+public class CalculadoraGUI extends JFrame implements ActionListener, KeyListener, WindowListener, WindowStateListener {
     private Calculadora calculadora;
     private JLabel pantallaResultado;
     private JLabel pantallaAlmacenada; // Nueva pantalla para mostrar valor almacenado
@@ -28,6 +28,18 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        addWindowStateListener(this);
+        addWindowStateListener(e -> {
+            if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
+                setSize(width, 600);
+            }
+        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e); // Llama al método ajustado
+            }
+        });
 
         // Cargar la imagen de fondo
         try {
@@ -55,6 +67,33 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
 
         addComponentListener(new ComponentAdapter() {
             @Override
+            public void componentResized(ComponentEvent e) {
+                int newWidth = getWidth();
+                int newHeight = getHeight();
+
+                // Ajustar las fuentes en base al tamaño de la ventana
+                float baseFontSize = Math.min(newWidth, newHeight) / 30.0f;
+                pantallaResultado.setFont(fuentePersonalizada.deriveFont(baseFontSize * 2));
+                pantallaAlmacenada.setFont(fuentePersonalizada.deriveFont(baseFontSize));
+
+                // Ajustar botones numéricos y de operaciones
+                for (Component comp : getContentPane().getComponents()) {
+                    if (comp instanceof JPanel) {
+                        for (Component subComponent : ((JPanel) comp).getComponents()) {
+                            if (subComponent instanceof JButton) {
+                                ((JButton) subComponent).setFont(fuentePersonalizada.deriveFont(baseFontSize));
+                            }
+                        }
+                    }
+                }
+
+                revalidate();
+                repaint();
+            }
+        });
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
             public void componentMoved(ComponentEvent e) {
                 setLocationRelativeTo(null);
             }
@@ -63,7 +102,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         // Configurar el panel de modo de entrada
         panelModoEntrada = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelModoEntrada.setOpaque(false); // Hacer transparente
-        labelModoEntrada = new JLabel("Modo Actual: Libre", SwingConstants.LEFT);
+        labelModoEntrada = new JLabel("Modo Actual:" + modoEntrada, SwingConstants.LEFT);
         labelModoEntrada.setForeground(Color.WHITE);
         labelModoEntrada.setFont(fuentePersonalizada);
         panelModoEntrada.add(labelModoEntrada);
@@ -71,7 +110,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         add(panelModoEntrada, BorderLayout.NORTH);
 
         // Nueva pantalla para mostrar el valor almacenado y el modo de entrada
-        pantallaAlmacenada = new JLabel("Valor Almacenado: 0   |   Modo Actual: Libre", SwingConstants.RIGHT);
+        pantallaAlmacenada = new JLabel("Valor Almacenado: 0   |   Modo Actual: " + modoEntrada, SwingConstants.RIGHT);
         pantallaAlmacenada.setOpaque(false); // Hacer transparente
         pantallaAlmacenada.setForeground(Color.WHITE);
         pantallaAlmacenada.setFont(fuentePersonalizada.deriveFont(18f));
@@ -110,7 +149,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
         JPanel panelCentral = new JPanel(new GridBagLayout());
         panelCentral.setOpaque(false); // Hacer transparente
         panelCentral.setBorder(BorderFactory.createEmptyBorder());
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         // Configuración para el panel de números
         gbc.gridx = 0;
@@ -305,7 +344,26 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
     public void windowDeactivated(WindowEvent e) {
     }
 
+    @Override
+    public void windowStateChanged(WindowEvent e) {
+        if ((e.getNewState() & Frame.NORMAL) == Frame.NORMAL) {
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+    }
+
     public void setModoEntrada(String modo) {
+        this.modoEntrada = modo;
+        labelModoEntrada.setText("Modo Actual: " + modo);
+        if (modo.equals("Ratón")) {
+            removeKeyListener(this);
+        } else if (modo.equals("Teclado Numérico")) {
+            addKeyListener(this);
+        } else if (modo.equals("Libre")) {
+            addKeyListener(this);
+        }
+        panelModoEntrada.repaint();
+        this.requestFocusInWindow();
+
         this.modoEntrada = modo;
         labelModoEntrada.setText("Modo Actual: " + modo);
         this.modoEntrada = modo;
@@ -318,6 +376,7 @@ public class CalculadoraGUI extends JFrame implements ActionListener, KeyListene
             CalculadoraGUI calculadoraGUI = new CalculadoraGUI();
             calculadoraGUI.setVisible(true);
             calculadoraGUI.setModoEntrada("Libre");
+            calculadoraGUI.setLocationRelativeTo(null);
         });
     }
 }
