@@ -9,7 +9,7 @@ import java.io.File;
 public class CalculadoraGUI extends JFrame implements ActionListener, KeyListener, WindowListener, WindowStateListener {
     private Calculadora calculadora;
     private JLabel pantallaResultado;
-    private JLabel pantallaAlmacenada; // Nueva pantalla para mostrar valor almacenado
+    private JLabel pantallaAlmacenada; 
     private StringBuilder entrada;
     private String modoEntrada;
     private JPanel panelModoEntrada;
